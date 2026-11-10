@@ -51,7 +51,8 @@ Git; they are recreated automatically.
 1. Download or clone this repository.
 2. Double-click **`START-HERE.bat`**.
 3. The first run downloads Android platform-tools, androidqf, and scrcpy, then
-   creates `.venv` and installs MVT and APKiD. This can take a few minutes.
+   creates `.venv` and installs MVT and APKiD (versions pinned in
+   `requirements.txt`). This can take a few minutes.
 4. Connect the phone:
    - **1** for remote over Tailscale (recommended for a phone on another
      network), or
