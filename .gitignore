@@ -1,0 +1,22 @@
+# Local Python environment
+.venv/
+__pycache__/
+*.py[cod]
+
+# Downloaded binaries (start-here.ps1 fetches these automatically)
+tools/
+
+# Scan output and evidence
+cases/
+apks/
+mvt_results*/
+bugreport*
+*.log
+*.zip
+*.apk
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

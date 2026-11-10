@@ -1,0 +1,180 @@
+FOR THE PHONE OWNER - REMOTE SECURITY SCAN
+==========================================
+
+You are allowing a consented security check of your Samsung A16. The person
+checking it is on a different network, so the connection goes through
+Tailscale. Nothing is installed on your phone by the scan.
+
+You will do two things:
+  A. Connect the phone to Tailscale (two possible methods - the operator
+     will tell you which one).
+  B. Turn on Wireless debugging and read two ports and one code to the
+     operator.
+
+Keep the phone charged and unlocked during the check.
+
+================================================================
+PART A - CONNECT THE PHONE TO TAILSCALE
+================================================================
+
+There are two ways. Use only the one the operator tells you.
+
+----------------------------------------------------------------
+METHOD 1 - THE OPERATOR INVITED YOUR EMAIL (easiest)
+----------------------------------------------------------------
+
+1. Open the Tailscale invite email the operator sent you.
+
+2. If Tailscale is not installed, install it from the Play Store:
+   https://play.google.com/store/apps/details?id=com.tailscale.ipn
+
+3. Open the invite link again, or open Tailscale and sign in with the EXACT
+   email address the operator invited. Use the same sign-in provider that
+   email uses (Google, Microsoft, or email).
+
+4. If Tailscale asks which tailnet to join, choose the operator's tailnet.
+   It is usually named after the operator, not "Personal".
+
+5. Tap the connect button. Android asks to allow a VPN connection. Tap OK.
+
+6. Confirm Tailscale says "Connected" and shows an address like 100.x.y.z.
+
+7. Keep Tailscale ON. The VPN key icon must stay in the notification shade.
+
+----------------------------------------------------------------
+METHOD 2 - YOU KEEP YOUR OWN TAILSCALE AND SHARE ONLY THIS PHONE
+----------------------------------------------------------------
+
+Use this if you already have Tailscale or if you prefer not to join the
+operator's tailnet.
+
+1. Install Tailscale from the Play Store:
+   https://play.google.com/store/apps/details?id=com.tailscale.ipn
+
+2. Sign in with your own Google/Microsoft/email account.
+
+3. If Tailscale offers to create a tailnet, accept the free personal tailnet.
+
+4. Tap connect. Android asks to allow a VPN connection. Tap OK.
+
+5. Confirm Tailscale says "Connected" and shows an address like 100.x.y.z.
+
+6. Open your phone browser (Chrome or Samsung Internet) and go to:
+   https://login.tailscale.com/admin/machines
+
+7. Sign in with the same Tailscale account if asked.
+
+8. Find THIS phone in the machine list. It should show as Android and online.
+   If there are several devices, match the 100.x.y.z address shown in the
+   Tailscale app.
+
+9. Tap the "..." menu next to the phone (or the Share button).
+
+10. Choose Share.
+
+11. Enter the operator's Tailscale email address (the operator will give it
+    to you). Confirm and send. The invite is single-use and expires after
+    30 days.
+
+12. Tell the operator to accept the share from their email.
+
+13. Keep Tailscale ON.
+
+IMPORTANT: Share only this phone. Do not share your whole tailnet and do not
+share your other devices. If this phone is on a company/work tailnet and you
+do not see a Share option, tell the operator - use Method 1 instead.
+
+----------------------------------------------------------------
+BOTH METHODS - KEEP TAILSCALE ALIVE ON SAMSUNG
+----------------------------------------------------------------
+
+- Settings > Apps > Tailscale > Battery > Unrestricted.
+- Settings > Battery > Background usage limits > make sure Tailscale is not
+  in "Sleeping apps" or "Deep sleeping apps".
+- Turn off any other VPN (Samsung Secure Wi-Fi, a work VPN, etc.). Android
+  allows only one VPN at a time.
+- Wi-Fi or mobile data both work. Keep the phone online.
+
+================================================================
+PART B - TURN ON WIRELESS DEBUGGING
+================================================================
+
+1. Settings > About phone > Software information.
+
+2. Tap "Build number" 7 times. Enter your PIN if asked.
+
+3. Go back to Settings > Developer options.
+
+4. Turn ON "Wireless debugging".
+
+5. If Android asks "Allow wireless debugging on this network?", tap Allow.
+
+6. Do not tap "Pair device with pairing code" yet. Wait for the operator to
+   tell you. The port and code expire quickly.
+
+7. When the operator says go, tap "Pair device with pairing code".
+
+8. A popup appears with an IP address, a PORT, and a 6-digit CODE.
+   Keep the popup open.
+
+9. Read ONLY the PORT and the 6-digit CODE to the operator over the call.
+   Do NOT post them in a group chat or on social media.
+   The IP is not needed; the operator already knows the phone's Tailscale IP.
+
+10. After the operator says pairing succeeded, close the popup.
+
+11. The main "Wireless debugging" screen now shows "IP address & Port".
+    Read ONLY that PORT to the operator. It is different from the pairing
+    port.
+
+12. When Android shows "Allow USB debugging?" or "Allow wireless
+    debugging?", tap Allow. If "Always allow from this computer" is offered,
+    tick it.
+
+13. Optional: Developer options > turn ON "Stay awake" so the screen stays on
+    while charging.
+
+================================================================
+PART C - KEEP IT READY DURING THE SCAN
+================================================================
+
+- Keep the phone unlocked and on the charger.
+- Keep Tailscale connected.
+- Keep Wireless debugging ON.
+- Do not reboot the phone.
+- Do not toggle Wireless debugging off; the ports change.
+- If the pairing code expires, tap "Pair device with pairing code" again and
+  read the new port and code.
+- If the screen locks, unlock it.
+
+The scan itself can take 5-15 minutes, sometimes longer on a slow connection.
+
+================================================================
+WHAT THE OPERATOR WILL DO
+================================================================
+
+- Read the installed app list and security settings.
+- Collect an Android bugreport for offline analysis.
+- Run a known-indicator spyware scan (MVT).
+- Give you a summary and next steps.
+
+Nothing is installed on your phone. The connection uses Android's built-in
+Wireless debugging and Tailscale. You can turn both off as soon as the
+operator says the scan is finished. If you used Method 2, you can also stop
+sharing the phone from the Tailscale admin page.
+
+================================================================
+IF SOMETHING DOES NOT WORK
+================================================================
+
+- Tailscale says "Disconnected": open the app, tap connect, allow the VPN
+  prompt.
+- The operator cannot see the phone: confirm you are signed in with the
+  exact email from the invite (Method 1), or that the share was sent to the
+  operator's email (Method 2).
+- The phone is very warm or the battery drains: keep it on the charger;
+  this is normal during a long bugreport.
+- You want to stop: tell the operator. Turn off Wireless debugging and
+  Tailscale. The operator will stop.
+- If ADB is refused: check Settings > Security and privacy > Auto Blocker.
+  If it is on, turn it off temporarily, then turn it back on after the scan.

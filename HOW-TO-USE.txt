@@ -1,0 +1,150 @@
+ANDROID PHONE SECURITY TRIAGE - HOW TO USE
+==========================================
+
+Everything is installed in this folder. Nothing was installed system-wide.
+No admin rights are needed.
+
+THE PHONE IS REMOTE
+-------------------
+This setup uses Tailscale (already installed and signed in on this PC) so ADB
+can reach the phone over the internet without a USB cable.
+Run START-HERE.bat -> 10 (or `tailscale status`) to see the account and IP
+this PC is currently using. The scripts detect both automatically.
+If you need to switch to your own Tailscale account, run
+SWITCH-TAILSCALE-ACCOUNT.bat.
+
+FILES
+-----
+START-HERE.bat     Main menu - use this
+REMOTE-SETUP.bat   Remote phone connection helper (Tailscale)
+FULL-SCAN.bat      One-click full scan (prompts to connect if needed)
+CONNECT-PHONE.bat  Connect the phone (remote default, local fallback)
+SETUP-TOOLS.bat    Re-check / repair the tools
+SWITCH-TAILSCALE-ACCOUNT.bat  Sign out and use your own Tailscale account
+FOR-PHONE-OWNER.txt Send this to the phone owner - exact steps for them
+END-TO-END-GUIDE.md Full operator runbook - read this once before starting
+android-triage.ps1 The collector (called by the menu)
+start-here.ps1     The launcher behind the .bat files
+tools\             adb, androidqf, scrcpy
+.venv\             Python environment with MVT and APKiD
+cases\             Scan results (created on the first scan)
+
+If you need to switch to your own Tailscale account, run
+SWITCH-TAILSCALE-ACCOUNT.bat (or START-HERE.bat -> 11). It signs this PC out
+of the current account and opens the login flow for yours. The scripts detect
+the new IP automatically.
+
+QUICK START - REMOTE PHONE
+==========================
+
+STEP 1 - Put the phone in your Tailscale tailnet
+------------------------------------------------
+Two methods. Pick one and tell the owner which one you are using.
+Full details are in END-TO-END-GUIDE.md.
+
+METHOD A - invite the owner into YOUR tailnet (fewest steps):
+  1. Open https://login.tailscale.com/admin/users
+  2. Invite the phone owner's email address.
+  3. On the phone: install Tailscale from the Play Store.
+  4. Open the invite link, sign in with that exact email, turn the VPN ON.
+  5. The phone appears directly in your tailnet.
+  Privacy: with the default ACL, the owner can see your other devices.
+
+METHOD B - owner keeps their own tailnet and shares only the phone:
+  1. Owner installs Tailscale and signs in with their own account.
+  2. Owner opens https://login.tailscale.com/admin/machines on the phone.
+  3. Owner finds the phone -> Share -> enters YOUR Tailscale email
+     (the email shown by `tailscale status`).
+  4. You accept the share from the email.
+  5. The phone appears in your tailnet as a shared device.
+  More private: the owner does not join your tailnet.
+
+Free plan is enough. No port forwarding, no public IP, no router changes.
+
+STEP 2 - Connect
+----------------
+  1. Double-click REMOTE-SETUP.bat (or START-HERE.bat -> 1).
+  2. The script lists Android devices in the tailnet. Pick the phone.
+  3. On the phone:
+     - Settings > About phone > Software information > tap Build number 7 times
+     - Settings > Developer options > Wireless debugging > ON
+     - Tap "Pair device with pairing code"
+  4. Enter the PAIRING PORT shown in the popup (ignore the IP, the script
+     already knows the phone's Tailscale IP).
+  5. Type the 6-digit code when adb asks.
+  6. Enter the CONNECT PORT shown on the Wireless debugging screen
+     (this is a different port from the pairing port).
+
+Keep the phone unlocked and charging during the scan. Tailscale must stay ON.
+Tip: Developer options > "Stay awake" (screen stays on while charging).
+
+STEP 3 - Scan
+-------------
+  1. START-HERE.bat -> 2 (FULL scan)
+  2. Wait. It runs: collector -> ADB bugreport -> MVT analysis.
+     Over a remote connection this can take 5-15 minutes.
+  3. summary.txt opens automatically when done.
+
+FULL scan (menu option 2) is fully automatic. Deep androidqf (menu option 4) is a
+separate, slower acquisition: androidqf 1.8.3 asks questions in the console
+(backup, APK download, intrusion logs) and can take much longer. Use it only
+when you need the extra artifacts.
+
+If the phone never appears in the tailnet:
+  - Make sure Tailscale on the phone says "Connected".
+  - Pull down the Tailscale notification and confirm it is on.
+  - On this PC, START-HERE.bat -> 10 shows the tailnet status.
+  - Fallback: START-HERE.bat -> 1 -> 2 for same Wi-Fi or USB.
+
+If Tailscale is not possible at all:
+  - Use TeamViewer QuickSupport or RustDesk on the phone for screen sharing,
+    and walk the owner through the on-device checklist manually.
+  - Run Play Protect and install Hypatia from F-Droid on the phone.
+  - ADB/MVT collection is not available without a network path.
+
+WHAT GETS CHECKED
+-----------------
+- Samsung integrity: verified boot, Knox warranty bit, bootloader lock
+- Third-party apps and installer source (sideloaded = installer=null)
+- Accessibility services and notification listeners (main stalkerware vectors)
+- Device administrators
+- VPN, Private DNS, developer options, ADB state
+- Android users/profiles and accounts
+- Running processes, services, logcat
+- ADB bugreport + MVT known-indicator analysis
+- androidqf acquisition (optional deep mode) + MVT
+- SHA-256 hashes of pulled sideloaded APKs
+
+INSTALLED VERSIONS
+------------------
+adb (platform-tools) 37.0.1
+androidqf            1.8.3   (SHA-256 verified)
+scrcpy               5.0.1
+MVT                  2026.11.2
+APKiD                3.2.0
+Python venv          3.11.9  (local only)
+Tailscale            1.104.1 (PC, already signed in)
+
+NOTES
+-----
+- androidqf is an unsigned open-source binary; Windows SmartScreen may warn once.
+- androidqf 1.8.3 does not support the newer unattended flags. That is why the
+  automatic FULL scan uses ADB bugreport + MVT, and androidqf is the optional
+  interactive deep-acquisition mode.
+- MVT's old check-adb command was removed upstream. This toolkit uses the
+  current supported paths: check-bugreport and check-androidqf.
+- MobSF (menu option 7) needs Docker Desktop running. First start downloads
+  the image (~1 GB).
+- A non-rooted phone cannot be fully imaged. A clean result means
+  "no known indicators found", not proof of cleanliness.
+- Only use this on a phone you own or have written consent to examine.
+- Do not expose ADB by port-forwarding it on the phone's router. Tailscale is
+  the secure path.
+
+IF SOMETHING IS FOUND
+---------------------
+1. Do not factory reset yet if this may become a legal case. Keep the case folder.
+2. Change Google/Samsung/WhatsApp/bank passwords from a CLEAN device; enable 2FA.
+3. Uninstall the app, then factory reset and set up as new.
+4. High-risk case: Access Now (accessnow.org/help) or Amnesty Security Lab
+   (securitylab.amnesty.org).
