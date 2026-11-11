@@ -618,7 +618,7 @@ function Show-Menu {
     while ($true) {
         Clear-Host
         Write-Host '=====================================================' -ForegroundColor Cyan
-        Write-Host '  Android Phone Security Triage  -  Samsung A16'       -ForegroundColor Cyan
+        Write-Host '  Android Phone Security Triage'       -ForegroundColor Cyan
         Write-Host '=====================================================' -ForegroundColor Cyan
         Show-Status
         Write-Host ''

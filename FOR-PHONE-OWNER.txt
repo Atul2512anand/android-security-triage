@@ -1,9 +1,10 @@
 FOR THE PHONE OWNER - REMOTE SECURITY SCAN
 ==========================================
 
-You are allowing a consented security check of your Samsung A16. The person
-checking it is on a different network, so the connection goes through
-Tailscale. Nothing is installed on your phone by the scan.
+You are allowing a consented security check of your Android phone
+(Samsung A16, Redmi 12 5G, or similar). The person checking it is on a
+different network, so the connection goes through Tailscale. Nothing is
+installed on your phone by the scan.
 
 You will do two things:
   A. Connect the phone to Tailscale (two possible methods - the operator
