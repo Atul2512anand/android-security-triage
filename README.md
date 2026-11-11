@@ -3,8 +3,8 @@
 A consented, click-to-run Windows toolkit for checking a remote Android phone
 for known spyware, stalkerware, and backdoor indicators.
 
-Built for a Samsung Galaxy A16, but works with any Android device that supports
-ADB wireless debugging. The phone can be on a different network: the connection
+Built for a Samsung Galaxy A16 and tested on a Redmi 12 5G; it works with any
+Android device that supports ADB debugging. The phone can be on a different network: the connection
 goes through Tailscale, and collection is done over ADB. No app is installed on
 the phone.
 
