@@ -178,3 +178,73 @@ IF SOMETHING DOES NOT WORK
   Tailscale. The operator will stop.
 - If ADB is refused: check Settings > Security and privacy > Auto Blocker.
   If it is on, turn it off temporarily, then turn it back on after the scan.
+
+===============================================================
+TAILSCALE LOGIN - BROWSER SIGNS IN BUT APP STAYS LOGGED OUT
+===============================================================
+
+This is usually an Android "app link" problem, not a wrong password.
+Try these in order. After each step, open Tailscale and tap Log in again.
+
+1. Make Chrome the default browser.
+   Settings > Apps > Choose default apps > Browser app > Chrome.
+   If Chrome is not installed, install it from the Play Store.
+
+2. Let Tailscale open its own login link.
+   Settings > Apps > Tailscale > Open by default
+   > Open supported links > Allow all links.
+   On some Samsung phones the path is:
+   Settings > Apps > Tailscale > Set as default > Open supported links.
+
+3. Start the login from inside the Tailscale app.
+   Do not open login.tailscale.com yourself.
+   Tap Log in in the app, sign in in Chrome, then:
+   - If Chrome asks "Open in Tailscale?", tap Open.
+   - If it does not ask, press the Recent apps button and switch back to
+     Tailscale by hand.
+
+4. If you use the email login link, open the email on THIS phone.
+   Opening it on a laptop logs in the laptop, not the phone.
+   If Gmail opens the link inside Gmail, tap the three-dot menu and choose
+   "Open in Chrome".
+
+5. Clear a half-finished login.
+   Settings > Apps > Tailscale > Storage > Clear data.
+   Open Tailscale and log in again.
+
+6. Turn off every other VPN.
+   Settings > Connections > More connection settings > VPN.
+   Android allows only one VPN at a time. Turn off Samsung Secure Wi-Fi,
+   work VPNs, and any "free VPN" app.
+   Then set Private DNS to Automatic:
+   Settings > Connections > More connection settings > Private DNS
+   > Automatic.
+
+7. Reinstall the official app.
+   Uninstall Tailscale, restart the phone, then install it from:
+   https://play.google.com/store/apps/details?id=com.tailscale.ipn
+
+8. Keep Tailscale awake.
+   Settings > Apps > Tailscale > Battery > Unrestricted.
+   Settings > Battery > Background usage limits > remove Tailscale from
+   "Sleeping apps" and "Deep sleeping apps".
+
+9. Update Chrome and Android System WebView in the Play Store.
+   Set date and time to automatic.
+
+10. If it still fails, try a different sign-in method:
+    use "Sign in with Google" instead of the email link, or the other way
+    around.
+
+SPECIAL CASES
+- Secure Folder or work profile: uninstall Tailscale there and install it in
+  the main personal profile. Login links cannot cross profiles.
+- Samsung Auto Blocker: Settings > Security and privacy > Auto Blocker.
+  Turn it off temporarily and retry.
+- Company or school phone: the organization may block VPN apps. Tell the
+  operator.
+
+IF IT STILL DOES NOT WORK, tell the operator:
+- the exact text on the Tailscale screen,
+- whether Chrome shows "Open in Tailscale?",
+- the phone model and Android version.
