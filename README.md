@@ -238,14 +238,16 @@ Two rules that prevent most false alarms:
 
 ## Example report
 
-A real consented scan is published as a redacted summary:
+A real consented scan and a no-root data-export case study are published as
+redacted summaries:
 
-- [`reports/2026-11-11-redmi-12-5g.md`](reports/2026-11-11-redmi-12-5g.md)
+- [`reports/2026-11-11-redmi-12-5g.md`](reports/2026-11-11-redmi-12-5g.md) — triage findings
+- [`reports/2026-11-12-data-export-case-study.md`](reports/2026-11-12-data-export-case-study.md) — what ADB can and cannot extract
 
-It shows the findings and the level of detail a report contains. The case
-folder itself (bugreport, APKs, account dump) stays local. Serial numbers,
-account identifiers, IP addresses, per-service account counts and the personal
-app list are removed before publication.
+They show the findings and the level of detail a report contains. The case
+folder itself (bugreport, APKs, account dump, exported content) stays local.
+Serial numbers, account identifiers, IP addresses, per-service account counts
+and the personal app list are removed before publication.
 
 ## Switching Tailscale accounts
 
