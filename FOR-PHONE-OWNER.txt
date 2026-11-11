@@ -85,23 +85,39 @@ share your other devices. If this phone is on a company/work tailnet and you
 do not see a Share option, tell the operator - use Method 1 instead.
 
 ----------------------------------------------------------------
-BOTH METHODS - KEEP TAILSCALE ALIVE ON SAMSUNG
+BOTH METHODS - KEEP TAILSCALE ALIVE (SAMSUNG, XIAOMI/REDMI, OTHERS)
 ----------------------------------------------------------------
 
+Samsung:
 - Settings > Apps > Tailscale > Battery > Unrestricted.
 - Settings > Battery > Background usage limits > make sure Tailscale is not
   in "Sleeping apps" or "Deep sleeping apps".
+
+Xiaomi / Redmi / POCO (MIUI or HyperOS):
+- Settings > Apps > Manage apps > Tailscale > Autostart: ON.
+- Settings > Apps > Manage apps > Tailscale > Battery saver:
+  No restrictions.
+- Open Recent apps, find Tailscale, swipe down or tap the lock icon to lock
+  it so the system does not close it.
+- Settings > Battery > Battery saver: turn it off during the scan.
+
+All phones:
 - Turn off any other VPN (Samsung Secure Wi-Fi, a work VPN, etc.). Android
   allows only one VPN at a time.
+- Optional: Settings > Network & internet > VPN > Tailscale gear >
+  Always-on VPN: ON.
 - Wi-Fi or mobile data both work. Keep the phone online.
+- Keep the phone on the charger and the screen unlocked during the scan.
 
 ================================================================
 PART B - TURN ON WIRELESS DEBUGGING
 ================================================================
 
 1. Settings > About phone > Software information.
+   Xiaomi / Redmi / POCO: Settings > About phone > OS version.
 
 2. Tap "Build number" 7 times. Enter your PIN if asked.
+   Xiaomi / Redmi / POCO: tap "OS version" 7 times.
 
 3. Go back to Settings > Developer options.
 
@@ -186,6 +202,11 @@ TAILSCALE LOGIN - BROWSER SIGNS IN BUT APP STAYS LOGGED OUT
 This is usually an Android "app link" problem, not a wrong password.
 Try these in order. After each step, open Tailscale and tap Log in again.
 
+FIRST - TRY MOBILE DATA
+Turn off Wi-Fi, turn on mobile data, open Tailscale, and tap Log in.
+Some Wi-Fi networks (college, office, hotel) block Tailscale. If mobile
+data works, stay on mobile data for the whole scan.
+
 1. Make Chrome the default browser.
    Settings > Apps > Choose default apps > Browser app > Chrome.
    If Chrome is not installed, install it from the Play Store.
@@ -235,6 +256,23 @@ Try these in order. After each step, open Tailscale and tap Log in again.
 10. If it still fails, try a different sign-in method:
     use "Sign in with Google" instead of the email link, or the other way
     around.
+
+"OUT OF SYNC" OR "TLS forced: no port 80 dialed"
+This means the phone cannot reach Tailscale's coordination server.
+The login is fine; the network path is blocked.
+
+1. Switch networks: turn off Wi-Fi and use mobile data, or the reverse.
+   Wait 30 seconds, open Tailscale, and tap Connect.
+2. Settings > Network & internet > Private DNS > Automatic.
+3. Turn off every other VPN app.
+4. Xiaomi / Redmi / POCO: turn off Wi-Fi assistant / smart network switch
+   so the phone does not jump between Wi-Fi and mobile data.
+5. Force stop Tailscale (Settings > Apps > Tailscale > Force stop), reopen
+   it, and tap Connect.
+6. In Chrome, open https://controlplane.tailscale.com
+   A working network shows a plain "404 page not found" or similar.
+   If it times out, that network is blocking Tailscale. Use another network.
+7. Reboot the phone if the warning stays.
 
 SPECIAL CASES
 - Secure Folder or work profile: uninstall Tailscale there and install it in
