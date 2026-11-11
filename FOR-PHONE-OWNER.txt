@@ -12,6 +12,11 @@ You will do two things:
   B. Turn on Wireless debugging and read two ports and one code to the
      operator.
 
+If the operator also runs EXPORT-DATA.bat, they will copy photos, WhatsApp
+media and encrypted backups, Telegram files and logs to their PC. That is a
+separate step and needs your explicit consent. Ask them what will be copied
+and what will be deleted afterwards.
+
 Keep the phone charged and unlocked during the check.
 
 ================================================================

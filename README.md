@@ -143,6 +143,7 @@ Full details:
 | 9 | Show ADB device list |
 | 10 | Tailscale status / remote help |
 | 11 | Switch Tailscale account |
+| 12 | Export personal data (WhatsApp/Telegram/media/logs) |
 | 0 | Exit |
 
 ## What gets collected
@@ -170,6 +171,50 @@ cases\a16_YYYYMMDD_HHMMSS\
 
 A bugreport can take 5-15 minutes over a remote connection, sometimes longer
 when Tailscale relays traffic through DERP.
+
+## Data extraction (WhatsApp, Telegram, Chrome, logs)
+
+The triage scan looks for indicators; it does not copy chats. To export the
+actual data, run **`EXPORT-DATA.bat`** (or menu option 12). On a non-rooted
+phone it copies everything ADB can actually reach:
+
+- shared storage: photos, videos, downloads, documents, recordings;
+- WhatsApp media and the latest encrypted local backups;
+- Telegram media and files from both known locations;
+- logs, notifications, usage statistics, accounts and recent tasks;
+- a best-effort `content` query for SMS, call log and contacts;
+- `manifest.csv` with SHA-256 hashes and a report of what is still missing.
+
+It cannot read the live app databases without root:
+
+| Data | Without root | With root |
+|---|---|---|
+| WhatsApp media and encrypted backups | Yes | Yes |
+| WhatsApp messages in readable form | Export chat only | Yes (`msgstore.db`) |
+| Telegram messages / media | Export + shared media | Yes (`cache4.db`) |
+| Chrome history | Google Takeout only | Yes (`History`) |
+| Chrome cookies / saved passwords | No | Encrypted; Frida or forensic tool |
+| SMS / call log / contacts databases | Exporter app only | Yes |
+| Logs and bugreport | Yes | Yes |
+
+Read **[`DATA-EXTRACTION.md`](DATA-EXTRACTION.md)** before starting. It has the
+full truth table, the exact WhatsApp/Telegram/Takeout steps, the root procedure,
+the risks, and the commercial-forensic option. **Unlocking the bootloader wipes
+the phone**, so do the no-root exports first.
+
+```powershell
+# Preview sizes only
+.\export-data.ps1 -Preset all -ListOnly
+
+# WhatsApp media + latest encrypted backups
+.\export-data.ps1 -Preset whatsapp
+
+# Everything shared + logs
+.\export-data.ps1 -Preset all -WithBugreport
+
+# App-private data (only on an already-rooted phone)
+.\export-data.ps1 -Root -Yes
+```
 
 ## Scan modes
 
@@ -221,6 +266,10 @@ that account can delete the device entry.
 - Do not port-forward ADB on the phone's router. Tailscale is the secure path.
 - A non-rooted phone cannot be fully imaged. This is a triage snapshot, not a
   forensic image.
+- `EXPORT-DATA.bat` copies personal data. Keep `cases\` local, private and out
+  of Git; pause OneDrive sync if that matters.
+- Rooting or unlocking the bootloader wipes the phone and may break banking,
+  wallet and DRM apps. Read `DATA-EXTRACTION.md` before doing it.
 - A clean result means no known indicators were found, not proof of
   cleanliness. False negatives and false positives are both possible.
 - Keep the case folder secure; it contains personal data.
@@ -242,6 +291,8 @@ licenses and are not vendored in this repository.
   - adb
 - [MobSF](https://github.com/MobSF/Mobile-Security-Framework-MobSF) - optional
   APK scanner
+- [wa-crypt-tools](https://github.com/ElDavoo/wa-crypt-tools) - optional
+  WhatsApp backup decryption
 - [Tailscale](https://tailscale.com/) - WireGuard-based remote network
 
 ## License

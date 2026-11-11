@@ -19,11 +19,13 @@ A click-to-run Windows wrapper around open-source Android triage tools. It:
 3. runs **MVT** against known spyware indicator lists;
 4. pulls sideloaded APKs and hashes them;
 5. runs **APKiD** or **MobSF** on the APKs when needed;
-6. writes everything into one timestamped case folder that stays local.
+6. exports personal data on request (shared storage, logs, optional root app data);
+7. writes everything into one timestamped case folder that stays local.
 
-Nothing is installed on the phone. No root is required. The toolkit does not
-install apps or change app data; the optional USB fallback temporarily switches
-ADB to TCP mode and is reversible.
+Nothing is installed on the phone. No root is required for the triage scan or the
+normal export. The toolkit does not install apps or change app data; the optional
+USB fallback temporarily switches ADB to TCP mode and is reversible. Root export
+only reads `/data/data` when the phone is already rooted.
 
 | Item | Value |
 |---|---|
@@ -32,9 +34,10 @@ ADB to TCP mode and is reversible.
 | Connection | USB, same Wi-Fi, Tailscale, or ADB TCP 5555 fallback |
 | Scan modes | Quick, Full, Deep |
 | Analysis | MVT, APKiD, MobSF (optional) |
+| Export | Shared storage + logs (no root); app data (rooted phone) |
 | Output | `cases\<timestamp>\` (gitignored) |
 | Public report | `reports\` (redacted, safe to publish) |
-| Not supported | iOS, root-only app databases, full forensic imaging |
+| Not supported | iOS; app databases on a non-rooted phone; full forensic imaging |
 
 ---
 
@@ -59,6 +62,7 @@ flowchart LR
         APKID["APKiD<br/>.venv"]
         SCR["scrcpy<br/>tools/scrcpy"]
         MOB["MobSF<br/>Docker (optional)"]
+        EXP["export-data.ps1<br/>shared storage + root app data"]
         CASE["cases/TIMESTAMP/<br/>evidence + results"]
     end
 
@@ -66,7 +70,10 @@ flowchart LR
     PS --> ADB
     PS --> AQF
     PS --> SCR
+    PS --> EXP
+    EXP -->|adb pull / exec-out| ADB
     AQF -->|deep acquisition| CASE
+    EXP -->|shared storage / app data| CASE
     ADB <-->|USB| ADBD
     ADB <-->|Wi-Fi / Tailscale| ADBD
     ADB <-->|TCP 5555 fallback| ADBD
@@ -133,6 +140,7 @@ sequenceDiagram
 | `SETUP-TOOLS.bat` | Installs or repairs adb, androidqf, scrcpy, MVT and APKiD |
 | `CONNECT-PHONE.bat` | Runs the connection flow only |
 | `FULL-SCAN.bat` | Connects if needed, then runs collector + bugreport + MVT |
+| `EXPORT-DATA.bat` | Exports personal data (shared storage, logs, optional root app data) |
 | `REMOTE-SETUP.bat` | Opens the Tailscale remote-connection helper |
 | `CONNECT-TCP-5555.bat` | Connects to the phone's TCP 5555 port after USB setup |
 | `SWITCH-TAILSCALE-ACCOUNT.bat` | Signs the PC out of Tailscale and opens the login flow |
@@ -143,6 +151,7 @@ sequenceDiagram
 |---|---|
 | `start-here.ps1` | Setup, menu, Tailscale discovery, ADB pairing, scan launcher |
 | `android-triage.ps1` | The collector: runs ADB commands, builds the case folder, pulls APKs, calls MVT |
+| `export-data.ps1` | Shared-storage/log export with manifest; optional root app-data export |
 | `connect-tcp-5555.ps1` | Finds the phone in Tailscale and runs `adb connect <ip>:5555` |
 | `switch-tailscale-account.ps1` | Switches the PC to a different Tailscale account |
 
@@ -160,6 +169,7 @@ no admin rights are required.
 | **androguard** | not auto-installed | Manifest/permission inspection | Manual, optional |
 | **scrcpy** | `tools\scrcpy` | Live phone screen and control | Menu option 6 |
 | **MobSF** | Docker image | Full APK security report | Menu option 7, optional |
+| **wa-crypt-tools** | `.venv` (manual install) | Decrypts WhatsApp `.crypt14`/`.crypt15` backups | Export follow-up, optional |
 | **Tailscale** | system install | Private network path to a remote phone | Remote scans |
 | Python + venv | `.venv` | Runs MVT and APKiD | Setup |
 
@@ -201,6 +211,21 @@ cases\2026-11-11_224124\
 ```
 
 `cases\` is gitignored. It is not published to GitHub.
+
+A data export creates a separate `cases\export_<timestamp>\`:
+
+```text
+cases\export_2026-11-11_230000\
+  shared\                     photos, downloads, WhatsApp/Telegram media
+  logs\                       logcat, dumpsys, content queries, optional bugreport
+  appdata\                    root only: /data/data package tars, extracted
+  manifest.csv                path, size and SHA-256
+  EXPORT-README.txt           what was exported and what is still missing
+  commands.log                exact commands executed
+  pull.log                    adb pull output
+```
+
+See section 14 and `DATA-EXTRACTION.md` for the full extraction matrix.
 
 ---
 
@@ -340,6 +365,11 @@ exploit would be required, and unlocking the bootloader wipes the phone.
 
 See `reports\2026-11-11-redmi-12-5g.md` section 6 for the exact data-scope note.
 
+For extracting the actual content (WhatsApp media and backups, Telegram files,
+photos, logs), use `EXPORT-DATA.bat`; see section 14 and `DATA-EXTRACTION.md`.
+The triage scan and the data export are separate on purpose: scanning is
+read-only and small, exporting copies personal content.
+
 ---
 
 ## 8. Step-by-step: from zero to a report
@@ -382,6 +412,7 @@ See `reports\2026-11-11-redmi-12-5g.md` section 6 for the exact data-scope note.
 
 ### Optional follow-up
 
+- **Export personal data:** run `EXPORT-DATA.bat` (menu **12**). See section 14.
 - **Deep acquisition:** menu **4**.
 - **Live screen:** menu **6** (scrcpy).
 - **MobSF:** menu **7** (Docker Desktop required).
@@ -447,6 +478,7 @@ See `reports\2026-11-11-redmi-12-5g.md` section 6 for the exact data-scope note.
 |---|---|
 | `START-HERE.bat` | Main menu |
 | `FULL-SCAN.bat` | One-click full scan |
+| `EXPORT-DATA.bat` | Personal data export |
 | `CONNECT-PHONE.bat` | Connection flow |
 | `CONNECT-TCP-5555.bat` | ADB TCP fallback |
 | `REMOTE-SETUP.bat` | Tailscale remote helper |
@@ -454,12 +486,14 @@ See `reports\2026-11-11-redmi-12-5g.md` section 6 for the exact data-scope note.
 | `SWITCH-TAILSCALE-ACCOUNT.bat` | Tailscale account switch |
 | `start-here.ps1` | Menu, setup, connection, scan launcher |
 | `android-triage.ps1` | Collector and case-folder builder |
+| `export-data.ps1` | Shared-storage/log/root app-data export |
 | `connect-tcp-5555.ps1` | TCP 5555 connector |
 | `switch-tailscale-account.ps1` | Tailscale sign-out/login |
 | `requirements.txt` | Pinned MVT and APKiD versions |
 | `READING-THE-RESULTS.txt` | Flag and MVT severity guide |
 | `HOW-TO-USE.txt` | Short operator reference |
 | `END-TO-END-GUIDE.md` | Detailed operator runbook |
+| `DATA-EXTRACTION.md` | Extraction matrix, app exports, root and forensic options |
 | `FOR-PHONE-OWNER.txt` | Phone-side instructions |
 | `ADB-TCPIP-HELPER.zip` | Ready-to-run ADB + enable/disable scripts |
 | `reports\` | Redacted public scan summaries |
@@ -486,8 +520,12 @@ See `reports\2026-11-11-redmi-12-5g.md` section 6 for the exact data-scope note.
 | APKiD | Installed; run manually |
 | scrcpy live screen | Working |
 | MobSF | Optional; needs Docker Desktop |
+| Personal data export (shared storage, media, logs) | Working |
+| Root app-data export (`-Root`) | Requires a rooted phone |
+| Chrome cookies / saved passwords | Encrypted; Frida or forensic tool |
 | Redacted public report | Included |
-| Root / app database extraction | Out of scope |
+| App databases on a non-rooted phone | Out of scope (sandbox) |
+| App databases on a rooted phone | Supported by `export-data.ps1 -Root` |
 | iOS support | Out of scope |
 
 ---
@@ -503,6 +541,10 @@ See `reports\2026-11-11-redmi-12-5g.md` section 6 for the exact data-scope note.
   Both apps target API 36 on current phones.
 - MVT, androidqf, Shizuku, MobSF and ALEAPP cannot bypass the sandbox.
 
+The toolkit's `export-data.ps1` does not change that. It copies shared storage
+and runs app-level exports; with `-Root` it reads `/data/data` only when the
+phone is already rooted.
+
 What *is* possible without root:
 
 - pull shared storage such as `DCIM`, Downloads and WhatsApp media;
@@ -514,3 +556,80 @@ What *is* possible without root:
 
 A tool that claims to read these databases over plain ADB is using an exploit,
 requires root, or is fake. Treat it with suspicion.
+
+---
+
+## 14. Personal data export
+
+`EXPORT-DATA.bat` (menu **12**) is the content-export side of the toolkit. It is
+separate from the triage scan: the scan looks for indicators, the export copies
+the actual data. Full details, app-by-app steps and the root procedure are in
+[`DATA-EXTRACTION.md`](DATA-EXTRACTION.md).
+
+### 14.1 No-root export
+
+| Category | What it copies |
+|---|---|
+| `whatsapp-media` | `/sdcard/Android/media/com.whatsapp/WhatsApp/Media` |
+| `whatsapp-backups` | latest 2 `msgstore*.db.crypt14` files (ciphertext) |
+| `telegram` | both Telegram media roots in shared storage |
+| `dcim`, `pictures`, `movies` | photos and videos |
+| `downloads`, `documents`, `recordings` | user files and call recordings |
+| `logs` | logcat, notifications, usage stats, accounts, Wi-Fi, recents, settings |
+| `logs\content\` | `content query` attempt for SMS, call log, contacts |
+| `-WithBugreport` | full `adb bugreport` ZIP |
+| `manifest.csv` | path, size and SHA-256 of every file |
+
+```powershell
+.\export-data.ps1 -Preset all -WithBugreport
+.\export-data.ps1 -Preset whatsapp
+.\export-data.ps1 -Preset all -ListOnly       # size preview only
+```
+
+It does not install anything and does not print file contents to the console.
+The case folder is `cases\export_<timestamp>\` and is gitignored.
+
+### 14.2 Root export
+
+```powershell
+.\export-data.ps1 -Root -Yes
+```
+
+Requires a working `su`. It force-stops WhatsApp, Chrome and Telegram, tars each
+package from `/data/data` to `/data/local/tmp`, pulls the tar, deletes the
+temporary file, extracts it under `appdata\`, and writes `appdata_hashes.txt`.
+
+Default packages:
+
+```text
+com.whatsapp
+com.android.chrome
+org.telegram.messenger
+com.android.providers.telephony
+com.android.providers.contacts
+```
+
+What root gives you: WhatsApp `msgstore.db`, `wa.db` and the `key` file; Chrome
+`History`, `Cookies` and `Login Data`; Telegram `cache4.db`; the SMS database;
+the contacts/call-log database. Chrome cookies and passwords are still encrypted
+with Android Keystore; pulling the file is not the same as reading it.
+
+Root costs: unlocking the bootloader **wipes the phone**, trips Play Integrity,
+may break banking/wallet/DRM apps, and a bad flash can brick it. Export shared
+storage and run the app exports first.
+
+### 14.3 What still needs an app export or a lab
+
+| Data | Route |
+|---|---|
+| WhatsApp messages | In-app **Export chat**, or root + SQLite |
+| WhatsApp cloud backup | 64-digit key + `wa-crypt-tools wadecrypt` |
+| Telegram messages | **Export Telegram data** (JSON/HTML), or root |
+| Chrome history | Google Takeout, or root |
+| Chrome cookies / passwords | Frida/Keystore or a commercial forensic tool |
+| SMS / call log | Exporter app, or root |
+| Contacts | Contacts app → export `.vcf`, or root |
+| Wi-Fi passwords, Keystore, tokens | Root where possible; some are non-exportable |
+
+For a legally defensible extraction from a locked phone, use a forensic lab with
+Cellebrite, Oxygen, Magnet AXIOM or MSAB XRY. No free script can replace that.

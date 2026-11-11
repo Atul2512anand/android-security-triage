@@ -522,6 +522,15 @@ function Open-LastCase {
     Invoke-Item $latest.FullName
 }
 
+function Start-DataExport {
+    $exportScript = Join-Path $Root 'export-data.ps1'
+    if (-not (Test-Path $exportScript)) {
+        Write-Warn 'export-data.ps1 was not found. Re-download the repository.'
+        return
+    }
+    & powershell -NoProfile -ExecutionPolicy Bypass -File $exportScript
+}
+
 function Run-Scan {
     param(
         [ValidateSet('Full', 'Quick', 'Deep')]
@@ -633,6 +642,7 @@ function Show-Menu {
         Write-Host '  9) Show ADB device list'
         Write-Host ' 10) Tailscale status / remote help'
         Write-Host ' 11) Switch Tailscale account'
+        Write-Host ' 12) Export personal data (WhatsApp/Telegram/media/logs)'
         Write-Host '  0) Exit'
         Write-Host ''
 
@@ -652,6 +662,7 @@ function Show-Menu {
                 & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $Root 'switch-tailscale-account.ps1')
                 Pause-Any
             }
+            '12' { Start-DataExport; Pause-Any }
             '0' { return }
             default {
                 Write-Warn 'Invalid choice.'

@@ -18,6 +18,7 @@ FILES
 START-HERE.bat     Main menu - use this
 REMOTE-SETUP.bat   Remote phone connection helper (Tailscale)
 FULL-SCAN.bat      One-click full scan (prompts to connect if needed)
+EXPORT-DATA.bat    Export personal data (WhatsApp/Telegram/media/logs)
 CONNECT-PHONE.bat  Connect the phone (remote default, local fallback)
 CONNECT-TCP-5555.bat  Connect after USB TCP mode is enabled (fallback)
 SETUP-TOOLS.bat    Re-check / repair the tools
@@ -27,7 +28,10 @@ READING-THE-RESULTS.txt  What the automatic flags and MVT levels mean
 END-TO-END-GUIDE.md Full operator runbook - read this once before starting
 ARCHITECTURE.md    System diagram, tool roles, USB/Wi-Fi/Tailscale paths,
                    scan modes, step-by-step guide and troubleshooting
+DATA-EXTRACTION.md What can be extracted, what needs root, app export steps,
+                   WhatsApp decryption and the commercial-forensic option
 android-triage.ps1 The collector (called by the menu)
+export-data.ps1    The data export tool behind EXPORT-DATA.bat
 start-here.ps1     The launcher behind the .bat files
 tools\             adb, androidqf, scrcpy
 .venv\             Python environment with MVT and APKiD
@@ -136,6 +140,21 @@ WHAT GETS CHECKED
 - ADB bugreport + MVT known-indicator analysis
 - androidqf acquisition (optional deep mode) + MVT
 - SHA-256 hashes of pulled sideloaded APKs
+
+EXPORT PERSONAL DATA
+--------------------
+The scan checks for indicators. To export the actual content, run
+EXPORT-DATA.bat (or START-HERE.bat -> 12). It copies:
+- shared storage: photos, videos, downloads, documents, recordings
+- WhatsApp media + the latest encrypted local backups
+- Telegram media and files
+- logs, notifications, usage stats, accounts, recent tasks
+- a best-effort SMS / call log / contacts query
+- manifest.csv (SHA-256) and EXPORT-README.txt
+Without root it cannot read the live WhatsApp/Chrome/Telegram databases,
+Chrome cookies, or the SMS/contacts databases. Root mode (.\\export-data.ps1
+-Root) can, but unlocking the bootloader wipes the phone. Read
+DATA-EXTRACTION.md first.
 
 INSTALLED VERSIONS
 ------------------
