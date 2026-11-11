@@ -19,6 +19,7 @@ START-HERE.bat     Main menu - use this
 REMOTE-SETUP.bat   Remote phone connection helper (Tailscale)
 FULL-SCAN.bat      One-click full scan (prompts to connect if needed)
 CONNECT-PHONE.bat  Connect the phone (remote default, local fallback)
+CONNECT-TCP-5555.bat  Connect after USB TCP mode is enabled (fallback)
 SETUP-TOOLS.bat    Re-check / repair the tools
 SWITCH-TAILSCALE-ACCOUNT.bat  Sign out and use your own Tailscale account
 FOR-PHONE-OWNER.txt Send this to the phone owner - exact steps for them
@@ -77,6 +78,24 @@ STEP 2 - Connect
 
 Keep the phone unlocked and charging during the scan. Tailscale must stay ON.
 Tip: Developer options > "Stay awake" (screen stays on while charging).
+
+IF WIRELESS DEBUGGING AND TAILSCALE CONFLICT
+--------------------------------------------
+Android only keeps Wireless debugging ON while the phone is on Wi-Fi.
+If that Wi-Fi blocks Tailscale (the phone shows "Out of sync"), use ADB
+over TCP instead:
+
+  1. On the owner's Windows PC: connect the phone by USB, enable USB
+     debugging, and authorize the PC.
+  2. Put adb on that PC (the toolkit's tools\platform-tools folder works)
+     and run:
+         adb tcpip 5555
+  3. Unplug USB. The phone can stay on mobile data, so Tailscale stays on.
+  4. On this PC: double-click CONNECT-TCP-5555.bat.
+  5. Start the FULL scan.
+
+After the scan, reconnect USB and run `adb usb`, or restart the phone, to
+close port 5555.
 
 STEP 3 - Scan
 -------------

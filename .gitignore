@@ -6,6 +6,9 @@ __pycache__/
 # Downloaded binaries (start-here.ps1 fetches these automatically)
 tools/
 
+# Local USB helper package (contains ADB binaries); send the ZIP separately
+ADB-TCPIP-HELPER/
+
 # Scan output and evidence
 cases/
 apks/

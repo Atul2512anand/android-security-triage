@@ -85,6 +85,21 @@ Then on the phone:
 The toolkit prompts for the pairing port, the pairing code, and then the
 connect port. The pairing port and the connect port are different.
 
+### If Wireless debugging and Tailscale conflict
+
+Android only enables Wireless debugging while the phone is on Wi-Fi. If that
+Wi-Fi blocks Tailscale (the phone shows "Out of sync"), use ADB over TCP:
+
+1. On a Windows PC, connect the phone by USB and enable USB debugging.
+2. Run `adb tcpip 5555` (the `tools\platform-tools` folder in this repo
+   works).
+3. Unplug USB. The phone can stay on mobile data, so Tailscale stays online.
+4. On the operator PC, run `CONNECT-TCP-5555.bat`.
+5. Start the scan.
+
+After the scan, reconnect USB and run `adb usb`, or restart the phone, to
+close port 5555.
+
 Full details:
 
 - **`END-TO-END-GUIDE.md`** - complete operator runbook, including both
