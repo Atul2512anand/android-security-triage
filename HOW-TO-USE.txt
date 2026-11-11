@@ -25,6 +25,8 @@ SWITCH-TAILSCALE-ACCOUNT.bat  Sign out and use your own Tailscale account
 FOR-PHONE-OWNER.txt Send this to the phone owner - exact steps for them
 READING-THE-RESULTS.txt  What the automatic flags and MVT levels mean
 END-TO-END-GUIDE.md Full operator runbook - read this once before starting
+ARCHITECTURE.md    System diagram, tool roles, USB/Wi-Fi/Tailscale paths,
+                   scan modes, step-by-step guide and troubleshooting
 android-triage.ps1 The collector (called by the menu)
 start-here.ps1     The launcher behind the .bat files
 tools\             adb, androidqf, scrcpy

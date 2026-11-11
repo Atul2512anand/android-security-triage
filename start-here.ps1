@@ -9,7 +9,7 @@
 .PARAMETER SetupOnly
     Install/repair tools and exit.
 .PARAMETER FullScan
-    Connect if needed and run the full scan (collector + androidqf + MVT).
+    Connect if needed and run the full scan (collector + bugreport + MVT).
 .PARAMETER ConnectOnly
     Only run the wireless-debugging connection flow.
 #>

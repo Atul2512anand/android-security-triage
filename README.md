@@ -12,6 +12,22 @@ the phone.
 > written permission to examine. A clean result means no known indicators were
 > found in the collected data, not proof that the phone is clean.
 
+## Architecture and full guide
+
+- **[`ARCHITECTURE.md`](ARCHITECTURE.md)** - component diagram, data flow, every
+  tool, USB/Wi-Fi/Tailscale paths, scan modes, step-by-step runbook,
+  troubleshooting and limits.
+- **[`READING-THE-RESULTS.txt`](READING-THE-RESULTS.txt)** - how to interpret the
+  automatic flags and MVT severity levels.
+- **[`reports/2026-11-11-redmi-12-5g.md`](reports/2026-11-11-redmi-12-5g.md)** -
+  a redacted real-world example.
+
+```text
+Phone --ADB--> Windows toolkit --bugreport--> MVT
+                    |--APKs-----------------> APKiD / MobSF
+                    |--all------------------> cases\<timestamp>\
+```
+
 ## Features
 
 - Samsung integrity checks: verified boot state, Knox warranty bit, bootloader

@@ -6,6 +6,9 @@ side, the connection, the scan, and the cleanup. Follow it top to bottom.
 Everything here is consented. The owner must know what will be read and must
 agree before you connect.
 
+> For the architecture diagram, tool map and connection decision tree, see
+> [`ARCHITECTURE.md`](ARCHITECTURE.md).
+
 ---
 
 ## 0. The 30-second version
