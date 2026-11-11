@@ -100,6 +100,10 @@ Wi-Fi blocks Tailscale (the phone shows "Out of sync"), use ADB over TCP:
 After the scan, reconnect USB and run `adb usb`, or restart the phone, to
 close port 5555.
 
+A ready-to-run helper is included as **`ADB-TCPIP-HELPER.zip`**. It contains
+ADB and `ENABLE-ADB-TCPIP.bat` / `DISABLE-ADB-TCPIP.bat`, so the USB-side PC
+does not need a separate platform-tools download.
+
 Full details:
 
 - **`END-TO-END-GUIDE.md`** - complete operator runbook, including both
@@ -170,6 +174,17 @@ Two rules that prevent most false alarms:
 
 - `installer=null` is normal for preinstalled vendor apps.
 - `Knox warranty bit` is a Samsung-only field; ignore it on other phones.
+
+## Example report
+
+A real consented scan is published as a redacted summary:
+
+- [`reports/2026-11-11-redmi-12-5g.md`](reports/2026-11-11-redmi-12-5g.md)
+
+It shows the findings and the level of detail a report contains. The case
+folder itself (bugreport, APKs, account dump) stays local. Serial numbers,
+account identifiers, IP addresses, per-service account counts and the personal
+app list are removed before publication.
 
 ## Switching Tailscale accounts
 

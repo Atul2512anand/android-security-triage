@@ -18,6 +18,9 @@ bugreport*
 *.zip
 *.apk
 
+# The ready-to-run USB helper ZIP is published; the unpacked folder is not
+!ADB-TCPIP-HELPER.zip
+
 # OS / editor files
 .DS_Store
 Thumbs.db
