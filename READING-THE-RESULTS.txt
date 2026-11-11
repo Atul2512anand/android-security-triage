@@ -1,0 +1,158 @@
+READING THE TRIAGE RESULTS
+==========================
+
+The scan prints a `summary.txt` with three parts: device integrity, a list
+of "AUTOMATIC FLAGS", and package/account counts. The flags are heuristics,
+not a malware verdict. This guide explains what each one means so you can
+tell normal phone behaviour from a real problem.
+
+Golden rule: a flag tells you what to CHECK, not what to fear. Read the
+flag, find the app on the phone, and verify it with the owner.
+
+
+1. INTEGRITY SECTION
+--------------------
+Verified boot: green
+    The boot chain is intact. Good.
+Bootloader locked: 1
+    The phone cannot be flashed with a custom OS. Good.
+ro.debuggable: 0 and ro.secure: 1
+    This is a normal release build, not an engineering/debug build.
+Knox warranty bit
+    Samsung-only field. On a Xiaomi/Redmi/POCO, Pixel, OnePlus, etc. the
+    value is "unknown" or absent. That is NOT a problem. Ignore this line
+    on non-Samsung phones.
+Root / SELinux
+    No `su` binary and `Enforcing` means the phone is not rooted and the
+    kernel is enforcing Android's security model.
+
+
+2. COMMON AUTOMATIC FLAGS
+-------------------------
+
+SIDELOADED APP (installer=null)
+    Android reports no installer for apps that ship inside the system
+    image. This is normal for preinstalled apps from Xiaomi, Samsung,
+    Google and other vendors. It does NOT automatically mean the app was
+    downloaded from a website.
+    What to do: check whether the package looks like a system app
+    (com.miui.*, com.samsung.*, com.google.android.*). Pull it with
+    `adb pull` if you want to hash it. If an unknown package has
+    installer=null, inspect it with APKiD and its manifest.
+
+UNUSUAL INSTALLER (com.xiaomi.mipicks, com.xiaomi.discover, etc.)
+    The app was installed or updated through a vendor store or a vendor
+    recommendation service. On Xiaomi, `com.xiaomi.mipicks` is GetApps and
+    `com.xiaomi.discover` is the MIUI Discover service. On Samsung the
+    equivalent is Galaxy Store. This is normal.
+    What to do: confirm the app is one the owner recognises.
+
+NOTIFICATION LISTENER
+    An app can read notifications (including one-time passwords). The
+    system notification listeners on a Xiaomi phone are normally
+    `com.xiaomi.barrage` (MIUI notification effects) and Android Auto.
+    What to do: if a third-party app you do not recognise is listening,
+    open Settings > Notifications > Notification access and turn it off.
+    Treat any unknown listener with internet access as suspicious.
+
+ACCESSIBILITY SERVICE
+    Accessibility access can read the screen and tap for the user; it is
+    the favourite channel of Android banking trojans.
+    What to do: Settings > Accessibility > Downloaded apps. If an app you
+    do not recognise is enabled, disable it and investigate. The summary
+    line `accessibility_enabled: 0` means none are active, which is good.
+
+DEVICE ADMIN
+    A device admin can lock or wipe the phone. `(none detected)` is good.
+    What to do: Settings > Security > Device admin apps. Remove unknown
+    admins.
+
+MULTIPLE ANDROID USERS/PROFILES
+    A phone can have a work profile, a Xiaomi Second Space, a Samsung
+    Secure Folder, or a clone/dual-app profile. These are legitimate
+    privacy features, but they can also hide apps.
+    What to do: check `users.txt` and ask the owner whether they created
+    the profile. On Xiaomi, user 999 named "XSpace" is Second Space. A
+    work profile normally has a name like "Work profile" and an account.
+
+DEVELOPER OPTIONS ENABLED
+    Needed for ADB and for this scan. Turn it off after the triage if the
+    owner does not use it.
+
+VPN / PRIVATE DNS
+    `always_on_vpn_app` should be empty unless the owner uses a VPN.
+    `private_dns_mode: unknown` is common on MIUI and is not a problem by
+    itself. An unknown VPN or a strange private DNS host is worth asking
+    about.
+
+UNKNOWN SOURCES / REQUEST_INSTALL_PACKAGES
+    Modern Android grants "install unknown apps" per app, not globally.
+    Chrome, a file manager and WhatsApp commonly have it. The app-ops
+    history in the bugreport shows WHEN those apps were allowed to
+    install something; that timestamp often reveals how a sideloaded APK
+    arrived. A sideload is not automatically malicious, but a payment or
+    banking app installed outside the store is a red flag.
+
+
+3. MVT SEVERITY
+---------------
+MVT compares the phone against public indicators of compromise (IOCs) for
+known spyware families. It reports LOW, MEDIUM, HIGH and CRITICAL.
+
+CRITICAL / HIGH
+    A match with a known spyware indicator, or a dangerous configuration
+    (for example an accessibility service bound to a known malicious
+    package). Treat as an incident: preserve the case folder, do not
+    uninstall blindly, and get a second opinion.
+
+MEDIUM
+    Usually a suspicious capability or history entry, not a confirmed
+    infection. The common ones are:
+      - dumpsys_appops: an app was allowed to install packages, read the
+        clipboard, use location, and so on. The same entry can appear
+        several times because the bugreport has snapshots for each user
+        profile.
+      - dumpsys_battery_daily: apps were uninstalled/reinstalled. Normal
+        user behaviour.
+      - dumpsys_receivers / dumpsys_activities: an app registered for
+        sensitive broadcasts or exported a component.
+    Read the package name and the timestamp. If it is a system component
+    or a known app, it is usually noise.
+
+LOW
+    Informational. Example: the accessibility module counted installed
+    services, but none are enabled.
+
+Remember: 0 HIGH / 0 CRITICAL is a good result, not a guarantee. Unknown
+malware can exist. Combine MVT with the manual checks in section 2.
+
+
+4. WHEN TO ESCALATE
+-------------------
+Escalate and treat the phone as compromised if you find any of these:
+
+- An unknown app with an enabled accessibility service.
+- An unknown device administrator.
+- An unknown notification listener that also has internet access.
+- A banking/payment app installed outside the official store, especially
+  one whose package name imitates the real app (for example
+  com.phonepe.spoof instead of com.phonepe.app).
+- An unknown app with SMS read/send permissions.
+- A rooted phone the owner did not root, or an unlocked bootloader.
+- A HIGH or CRITICAL MVT alert.
+
+In those cases: disconnect the phone from the network, preserve the case
+folder, change important passwords from a different clean device, enable
+2FA, and consider a factory reset after the evidence is saved.
+
+
+5. WHAT A SCAN DOES NOT SEE
+---------------------------
+- It cannot read end-to-end encrypted messages.
+- It cannot prove an app is clean; it can only show what the manifest,
+  permissions and known indicators reveal.
+- A packed APK hides its code. A packer is not proof of malware, but it
+  limits static analysis. Behaviour and permissions matter more.
+- A phone that is powered off or offline cannot be scanned.
+
+END OF GUIDE

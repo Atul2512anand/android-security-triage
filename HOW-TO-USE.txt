@@ -23,6 +23,7 @@ CONNECT-TCP-5555.bat  Connect after USB TCP mode is enabled (fallback)
 SETUP-TOOLS.bat    Re-check / repair the tools
 SWITCH-TAILSCALE-ACCOUNT.bat  Sign out and use your own Tailscale account
 FOR-PHONE-OWNER.txt Send this to the phone owner - exact steps for them
+READING-THE-RESULTS.txt  What the automatic flags and MVT levels mean
 END-TO-END-GUIDE.md Full operator runbook - read this once before starting
 android-triage.ps1 The collector (called by the menu)
 start-here.ps1     The launcher behind the .bat files

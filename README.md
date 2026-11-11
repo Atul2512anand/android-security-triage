@@ -159,6 +159,18 @@ when Tailscale relays traffic through DERP.
 - **Deep** - interactive androidqf acquisition, then MVT. androidqf 1.8.3 asks
   questions in the console; answer them. Slower and optional.
 
+## Reading the results
+
+The automatic flags are heuristics, not a malware verdict. `READING-THE-RESULTS.txt`
+explains each common flag (sideloaded apps, vendor installers, notification
+listeners, multiple profiles, MVT severities) and lists the findings that do
+warrant escalation. Read it before acting on `summary.txt`.
+
+Two rules that prevent most false alarms:
+
+- `installer=null` is normal for preinstalled vendor apps.
+- `Knox warranty bit` is a Samsung-only field; ignore it on other phones.
+
 ## Switching Tailscale accounts
 
 If the PC is signed in with an account that is not yours, run
